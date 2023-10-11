@@ -1,0 +1,293 @@
+SECTION 1: GIT
+
+1. if you using git stash, where will it save data? What is diff b/w index and staging area?
+
+  - When we use git stash in Git, it saves our changes in a temporary area called the "stash"
+
+  - When we run git stash, Git will save our changes into a new stash entry. This includes changes to tracked files.
+  - The Git index refers to a critical component in Git's architecture, sometimes also known as the "staging area". It plays a central role in the process       of committing changes to a Git repository. 
+
+2. when would individuals use git rebase, git fast-forward, or a git fetch then push? 
+
+  - Git fetch
+	Bring the changes from remote repo and stores it on a separate branch, you can review the changes and merge normally if it is required.
+  - Git push
+	Moving the changes from workspace to remote repo or central repo
+  - Git rebase
+        use git rebase to squash multiple commits into a single commit or to combine several smaller.
+
+3. How to revert already pushed changes ?
+  - Git revert
+ 	Used to undo the committed changes , history will not be removed we can track the reverted the changes in the git log.
+
+4. What is the difference between cherry picking commits vs trying a hard reset. What is the final
+
+  - Cherry-picking is used to select and apply specific commits from one branch onto another branch. It allows we to pick and choose individual commits and     apply them to your current branch.
+  - A hard reset is used to move the branch pointer to a specific commit, effectively discarding all the commits that came after that commit.
+
+5. Explain the difference between git remote and git clone?
+
+  - The git remote command is used for managing remote repositories that our local repository is connected to. It doesn't perform any actual clone of the      remote repository's contents.
+  - Git clone command is used to bringing the remote repo to local workspace for the first time called as git clone.
+
+.................................................................................................................................................................
+
+SECTION 2: TERRAFORM
+
+
+1. what is the difference between terraform count and for_each meta data function? and give a
+  scenario-based example to use them?
+
+  - The "count" argument allows you to create multiple instances of a resource based on a numeric count. It's a simple way to generate a fixed number of        resource instances.
+  
+  - It's useful when we need to create a specific number of identical resources, like multiple virtual machines or database replicas.
+    resource "aws_instance" "Instace_name" {
+    count = 3
+    ami           = "ami-ID"
+    instance_type = "t2.micro"
+    }
+  - The "for_each" meta-argument allows we to create resource instances based on a map. It's more flexible and dynamic than count because it allows we to       specify individual resource instances with distinct attributes.
+  - It's useful when we want to create resources based on a variable number of elements or when each instance has a unique set of attributes.
+  - variable "web_servers" {
+    type = map(string)
+    default = {
+    web_server1 = "0.0.0.0"
+    web_server2 = "0.0.0.0"
+     }
+    }
+
+   resource "aws_instance" "Instace_name" {
+   for_each = var.web_servers
+   ami           = "ami-ID"
+   instance_type = "t2.micro"
+   private_ip = each.value
+   }
+
+2. What is Terraform taint ? When to use it? When would you use terraform state rm vs terraform
+   taint?
+  - Terraform Taint
+    The terraform taint command is used to mark a terraform managed resource as tainted, which will mark the resource to be destroyed and recreated in the     new apply operation.
+  - Terraform state rm 
+        This command is used to remove a resource instance from Terraform's state, effectively "forgetting" about the resource. It doesn't directly affect          the infrastructure itself.
+  -  Terraform taint
+        This command marks a resource as tainted, meaning Terraform will recreate it during the next apply.
+
+
+3. How would you show a diagram of all terraform resources in the state file? When is this useful?
+ 
+  - we can use the terraform graph command to export your Terraform configuration to a .dot file.
+  - USE CASE
+   visualisation
+   Troublsoot
+   Compliance and Auditing
+
+4. Solve this expression:
+   count                  = var.run_remote_environment ? var.TFC_RUN_ID !=[&quot;Yes&quot;]) : null
+  -  using conditional logic to determine the value of the count attribute for a resource.
+    count = var.run_remote_environment ? (var.TFC_RUN_ID != "Yes" ? 1 : 0) : null
+
+5. How would you apply terraform to multiple accounts simultaneously? We want to ensure this
+   follows security best practices.
+  -  we can be achieved through careful planning and a combination of AWS Identity and Access Management policies, AWS Organizations, and Terraform modules. 
+     folling steps are
+     Set Up AWS Accounts
+     IAM Policies
+     Terraform Configuration
+     Parameterization
+     Secure State Files
+     Testing and Validation
+
+..........................................................................................................................................................
+
+SECTION 3: AWS
+
+1. You have an EC2 instance that has an unencrypted volume. You want to create another
+   Encrypted volume from this unencrypted volume. Which of the following steps can achieve this?
+   How would you share this encrypted volume to another account? What must you ensure to
+   make sure this cross-account encryption is shared?
+
+  - we can follow these steps:
+
+    Creating an Encrypted EBS Volume
+    1. Stop the EC2 instance
+    2 .Create a Snapshot of the Unencrypted Volume
+    3. Create an Encrypted EBS Volume from the Snapshot
+    4. Start the EC2 Instance
+
+   Sharing the Encrypted Volume with Another AWS Account:
+    1. Modify the Volume's Permissions
+    2. Add the AWS Account ID
+    3. Add the AWS Account ID
+    4. Share the Volume
+
+    Cross-Account Encryption Considerations:
+    1. KMS Key Policy
+    2. Trust Relationships
+    3. IAM Roles and Policies
+    4. Secure Transmission
+
+2. How will you implement service control policy and in which area are you using it?
+
+  - SCPs are primarily used to manage and restrict permissions at the root level of our organization and are typically used in AWS Organizations to enforce     security, compliance, and across multiple AWS accounts.
+  - Areas of Use for SCP
+    Security and Compliance
+    Data Isolation
+    Resource Sharing
+    Disaster Recovery and Backup 
+   
+3. How can you convert a public subnet to private subnet?
+
+  - To Converting a public subnet to a private subnet in Amazon Web Services involves adjusting the routing and security group configurations.
+    steps are
+    1. Modify Route Table
+    2. Create or Associate a Network Address Translation Gateway
+    3. Update Security Groups
+    4. Verify DNS Resolution and Hostnames
+    5. Consider Elastic IP Addresses
+    6. Test and Monitor
+
+4. What is the default route for any newly created route table?
+
+  - The default route for any newly created route table in an Amazon Virtual Private Cloud  is typically a local route. This local route allows all traffic     within the VPC CIDR block to flow between resources, subnets, and instances without the need for additional configuration.
+  
+5. How would you ensure routes in the route table DO NOT use the local routes? 
+
+  - Create a Custom Route Table
+  - Edit the Route Table
+  - Remove the Local Route
+  - Add Custom Routes
+  - Associate Subnets
+
+.....................................................................................................................................................
+
+SECTION 4: Programming Exercise
+
+  Exercise 1 (AWS) :
+  Terraform Code to create the below Infrastructure:
+   1 VPC in us-east-1 region. This should be flexible based on region. If no region is provided,
+  this should be built in us-east-1.
+   2 Subnets with high availability supported in 2 zones
+   1 Route table not including the default one. Routes should not be routed using the local
+  route.
+   Autoscaling group with a flexible cool down, deregistration delay, instance warm up.
+   2 EC2 instances created from the autoscaling group
+   ALB to load-balance the app servers. Ensure the port is flexible based on the application.
+   IAM roles should only be used by the account owner.
+
+  provider "aws" {
+  region = var.region
+  }
+
+  resource "aws_vpc" "my_vpc" {
+  cidr_block = "10.0.0.0/16"
+  }
+
+  resource "aws_subnet" "subnet_a" {
+  count                   = 2
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = cidrsubnet(aws_vpc.my_vpc.cidr_block, 8, count.index)
+  availability_zone       = element(var.availability_zones, count.index)
+  map_public_ip_on_launch = true
+  }
+
+  resource "aws_route_table" "custom_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+  }
+
+  resource "aws_route" "custom_route" {
+  route_table_id         = aws_route_table.custom_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  instance_id            = aws_instance.my_instance.id
+  }
+
+  resource "aws_autoscaling_group" "my_asg" {
+  name                      = "my-asg"
+  availability_zones        = var.availability_zones
+  launch_configuration       = aws_launch_configuration.my_launch_config.name
+  min_size                  = 2
+  max_size                  = 4
+  desired_capacity          = 2
+  default_cooldown          = var.asg_cooldown
+  health_check_grace_period = var.health_check_grace_period
+  health_check_type         = "ELB"
+  }
+
+  resource "aws_launch_configuration" "my_launch_config" {
+  name                 = "my-launch-config"
+  image_id             = var.ami_id
+  instance_type        = var.instance_type
+  iam_instance_profile = aws_iam_instance_profile.my_instance_profile.name
+  security_groups      = [aws_security_group.my_security_group.name]
+  user_data            = var.user_data
+  key_name             = var.key_name
+  security_groups      = [aws_security_group.my_security_group.name]
+  }
+
+  resource "aws_instance" "my_instance" {
+  count         = 2
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = element(aws_subnet.subnet_a[*].id, count.index)
+  user_data     = var.user_data
+  key_name      = var.key_name
+  }
+
+  resource "aws_security_group" "my_security_group" {
+  name_prefix = "my-security-group-"
+  }
+
+  resource "aws_lb" "my_lb" {
+  name               = "my-lb"
+  internal           = false
+  load_balancer_type = "application"
+  subnets            = aws_subnet.subnet_a[*].id
+  enable_deletion_protection = false
+  }
+
+  resource "aws_iam_instance_profile" "my_instance_profile" {
+  name = "my-instance-profile"
+  role = aws_iam_role.my_iam_role.name
+  }
+
+  resource "aws_iam_role" "my_iam_role" {
+  name = "my-iam-role"
+  }
+
+  resource "aws_iam_policy_attachment" "my_iam_policy_attachment" {
+  name       = "my-iam-policy-attachment"
+  policy_arn = "arn:aws:iam::aws:policy" 
+  roles      = [aws_iam_role.my_iam_role.name]
+  }
+
+  variable "region" {
+  default = "us-east-1"
+  }
+
+  variable "availability_zones" {
+  type    = list(string)
+  default = ["us-east-1a", "us-east-1b"] 
+  }
+
+  variable "ami_id" {
+  default = "ami-12345678" 
+  }
+
+  variable "instance_type" {
+  default = "t2.micro"
+  }
+
+  variable "asg_cooldown" {
+  default = 300
+  }
+
+  variable "user_data" {
+  default = ""
+  }
+
+  variable "key_name" {
+  default = "my-key-pair"
+  }
+
+  output "load_balancer_dns_name" {
+  value = aws_lb.my_lb.dns_name
+  }
